@@ -1001,6 +1001,7 @@ int nl_cache_refill(struct nl_sock *sk, struct nl_cache *cache)
 			nl_cache_set_arg1(cache, grp->ag_family);
 
 restart:
+		//向kernel发送更新请求
 		err = nl_cache_request_full_dump(sk, cache);
 		if (err < 0)
 			return err;

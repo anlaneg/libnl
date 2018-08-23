@@ -113,6 +113,7 @@ int nl_connect(struct nl_sock *sk, int protocol)
 	if (sk->s_fd != -1)
 		return -NLE_BAD_SOCK;
 
+	//创建对应的socket
 	sk->s_fd = socket(AF_NETLINK, SOCK_RAW | flags, protocol);
 	if (sk->s_fd < 0) {
 		errsv = errno;
@@ -122,6 +123,7 @@ int nl_connect(struct nl_sock *sk, int protocol)
 		goto errout;
 	}
 
+	//设置收发buffer大小
 	err = nl_socket_set_buffer_size(sk, 0, 0);
 	if (err < 0)
 		goto errout;

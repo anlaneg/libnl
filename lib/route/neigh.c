@@ -332,7 +332,7 @@ static int neigh_msg_parser(struct nl_cache_ops *ops, struct sockaddr_nl *who,
 	return err;
 }
 
-
+//解析邻居表项
 int rtnl_neigh_parse(struct nlmsghdr *n, struct rtnl_neigh **result)
 {
 	struct rtnl_neigh *neigh;
@@ -340,6 +340,7 @@ int rtnl_neigh_parse(struct nlmsghdr *n, struct rtnl_neigh **result)
 	struct ndmsg *nm;
 	int err;
 
+	//申请邻居表项
 	neigh = rtnl_neigh_alloc();
 	if (!neigh) {
 		err = -NLE_NOMEM;
@@ -425,6 +426,7 @@ errout:
 	return err;
 }
 
+//向kernel发送请求获取邻居表信息
 static int neigh_request_update(struct nl_cache *c, struct nl_sock *h)
 {
 	int family = c->c_iarg1;

@@ -96,6 +96,7 @@ int nl_cli_connect(struct nl_sock *sk, int protocol)
 	return err;
 }
 
+//申请sock,申请失败后，则主动退出
 struct nl_sock *nl_cli_alloc_socket(void)
 {
 	struct nl_sock *sock;

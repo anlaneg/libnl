@@ -61,7 +61,7 @@ struct nl_cb
 	int			(*cb_send_ow)(struct nl_sock *,
 					      struct nl_msg *);
 
-	int			cb_refcnt;
+	int			cb_refcnt;//引用计数
 	/** indicates the callback that is currently active */
 	enum nl_cb_type		cb_active;
 };
@@ -70,7 +70,7 @@ struct nl_sock
 {
 	struct sockaddr_nl	s_local;
 	struct sockaddr_nl	s_peer;
-	int			s_fd;
+	int			s_fd;//操作用的fd
 	int			s_proto;
 	unsigned int		s_seq_next;
 	unsigned int		s_seq_expect;

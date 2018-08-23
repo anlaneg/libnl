@@ -189,6 +189,7 @@ struct nl_cache_ops
 	 * Called whenever an update of the cache is required. Must send
 	 * a request message to the kernel requesting a complete dump.
 	 */
+	//用于向kernel发送更新请求
 	int   (*co_request_update)(struct nl_cache *, struct nl_sock *);
 
 	/**

@@ -43,6 +43,7 @@ int main(int argc, char *argv[])
 		.dp_fd = stdout,
 	};
  
+	//申请操作用的socket（空socket)
 	sock = nl_cli_alloc_socket();
 	nl_cli_connect(sock, NETLINK_ROUTE);
 	link_cache = nl_cli_link_alloc_cache(sock);

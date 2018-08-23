@@ -803,6 +803,7 @@ int nl_socket_modify_err_cb(struct nl_sock *sk, enum nl_cb_kind kind,
  */
 int nl_socket_set_buffer_size(struct nl_sock *sk, int rxbuf, int txbuf)
 {
+	//设置收发buffer大小
 	int err;
 	char buf[64];
 
