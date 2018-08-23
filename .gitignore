@@ -23,4 +23,7 @@ cscope.*
 /config.*
 /configure
 /libtool
+.cproject
+.project
+.settings/
 /*.pc
