@@ -99,9 +99,9 @@ enum nl_cb_type {
 	/** Message is an acknowledge */
 	NL_CB_ACK,
 	/** Called for every message received */
-	NL_CB_MSG_IN,
+	NL_CB_MSG_IN,//消息到来时执行此调用
 	/** Called for every message sent out except for nl_sendto() */
-	NL_CB_MSG_OUT,
+	NL_CB_MSG_OUT,//消息向外发送时调用，除nl_sendto()
 	/** Message is malformed and invalid */
 	NL_CB_INVALID,
 	/** Called instead of internal sequence number checking */

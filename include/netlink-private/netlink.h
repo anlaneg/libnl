@@ -137,6 +137,7 @@ extern int __str2flags(const char *, const struct trans_tbl *, size_t);
 
 extern void dump_from_ops(struct nl_object *, struct nl_dump_params *);
 
+//执行type对应的回调
 static inline int nl_cb_call(struct nl_cb *cb, int type, struct nl_msg *msg)
 {
 	int ret;

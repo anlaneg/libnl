@@ -113,7 +113,7 @@ int nl_connect(struct nl_sock *sk, int protocol)
 	if (sk->s_fd != -1)
 		return -NLE_BAD_SOCK;
 
-	//创建对应的socket
+	//创建对应的netlink socket
 	sk->s_fd = socket(AF_NETLINK, SOCK_RAW | flags, protocol);
 	if (sk->s_fd < 0) {
 		errsv = errno;
@@ -330,11 +330,13 @@ int nl_sendmsg(struct nl_sock *sk, struct nl_msg *msg, struct msghdr *hdr)
 
 	nlmsg_set_src(msg, &sk->s_local);
 
+	//如果有相应cb,则执行msg_out回调
 	cb = sk->s_cb;
 	if (cb->cb_set[NL_CB_MSG_OUT])
 		if ((ret = nl_cb_call(cb, NL_CB_MSG_OUT, msg)) != NL_OK)
 			return ret;
 
+	//调用sendmsg发送消息
 	ret = sendmsg(sk->s_fd, hdr, 0);
 	if (ret < 0) {
 		char errbuf[64];
@@ -789,6 +791,7 @@ abort:
 }
 
 /** @cond SKIP */
+//调用指定类型的回调，依据结果，goto到out,stop,skip等标签
 #define NL_CB_CALL(cb, type, msg) \
 do { \
 	err = nl_cb_call(cb, type, msg); \

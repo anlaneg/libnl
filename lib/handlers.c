@@ -153,6 +153,7 @@ static int nl_ack_handler_debug(struct nl_msg *msg, void *arg)
 	return NL_STOP;
 }
 
+//各类型kind默认回调
 static nl_recvmsg_msg_cb_t cb_def[NL_CB_TYPE_MAX+1][NL_CB_KIND_MAX+1] = {
 	[NL_CB_VALID] = {
 		[NL_CB_VERBOSE]	= nl_valid_handler_verbose,
@@ -198,6 +199,7 @@ static nl_recvmsg_err_cb_t cb_err_def[NL_CB_KIND_MAX+1] = {
  * @arg kind		callback kind to be used for initialization
  * @return Newly allocated callback handle or NULL
  */
+//申请空的callback控制块
 struct nl_cb *nl_cb_alloc(enum nl_cb_kind kind)
 {
 	int i;
@@ -300,9 +302,11 @@ int nl_cb_set(struct nl_cb *cb, enum nl_cb_type type, enum nl_cb_kind kind,
 		return -NLE_RANGE;
 
 	if (kind == NL_CB_CUSTOM) {
+		//如果kind为custom,则置func
 		cb->cb_set[type] = func;
 		cb->cb_args[type] = arg;
 	} else {
+		//如果kind不为custom,则置cb_def
 		cb->cb_set[type] = cb_def[type][kind];
 		cb->cb_args[type] = arg;
 	}

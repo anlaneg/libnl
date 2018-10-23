@@ -38,7 +38,9 @@ struct nl_hash_table;
 
 struct nl_cb
 {
+	//各type回调函数
 	nl_recvmsg_msg_cb_t	cb_set[NL_CB_TYPE_MAX+1];
+	//各type回调函数参数
 	void *			cb_args[NL_CB_TYPE_MAX+1];
 
 	nl_recvmsg_err_cb_t	cb_err;
