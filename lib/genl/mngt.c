@@ -91,6 +91,7 @@ static int genl_msg_parser(struct nl_cache_ops *ops, struct sockaddr_nl *who,
 	return cmd_msg_parser(who, nlh, ops->co_genl, ops, pp);
 }
 
+//通过family查询ops
 static struct genl_ops *lookup_family(int family)
 {
 	struct genl_ops *ops;
@@ -169,12 +170,15 @@ int genl_register_family(struct genl_ops *ops)
 	if (ops->o_cmds && ops->o_ncmds <= 0)
 		return -NLE_INVAL;
 
+	//检查family是否已存在
 	if (ops->o_id && lookup_family(ops->o_id))
 		return -NLE_EXIST;
 
+	//名称检查
 	if (lookup_family_by_name(ops->o_name))
 		return -NLE_EXIST;
 
+	//将ops注册到genl_ops_list
 	nl_list_add_tail(&ops->o_list, &genl_ops_list);
 
 	return 0;
