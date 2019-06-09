@@ -247,6 +247,7 @@ int nla_parse(struct nlattr *tb[], int maxtype, struct nlattr *head, int len,
 
 	memset(tb, 0, sizeof(struct nlattr *) * (maxtype + 1));
 
+	//解析消息并填充至tb中
 	nla_for_each_attr(nla, head, len, rem) {
 		int type = nla_type(nla);
 
