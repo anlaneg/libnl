@@ -61,7 +61,7 @@ struct nl_cb
 	/** Overwrites internal calls to nl_send, must send the netlink
 	 * message. */
 	int			(*cb_send_ow)(struct nl_sock *,
-					      struct nl_msg *);
+					      struct nl_msg *);/*可overwrite内部的netlink发送函数，用于消息发送*/
 
 	int			cb_refcnt;//引用计数
 	/** indicates the callback that is currently active */
@@ -77,7 +77,7 @@ struct nl_sock
 	unsigned int		s_seq_next;
 	unsigned int		s_seq_expect;
 	int			s_flags;
-	struct nl_cb *		s_cb;
+	struct nl_cb *		s_cb;/*消息发送处理相关回调结构*/
 	size_t			s_bufsize;
 };
 
@@ -139,7 +139,7 @@ struct nl_msg
 	struct sockaddr_nl	nm_src;
 	struct sockaddr_nl	nm_dst;
 	struct ucred		nm_creds;
-	struct nlmsghdr *	nm_nlh;
+	struct nlmsghdr *	nm_nlh;/*netlink消息头*/
 	size_t			nm_size;
 	int			nm_refcnt;
 };

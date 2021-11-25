@@ -378,6 +378,7 @@ int nla_memcpy(void *dest, const struct nlattr *src, int count)
  */
 size_t nla_strlcpy(char *dst, const struct nlattr *nla, size_t dstsize)
 {
+    //取数据长度（含'\0')
 	size_t srclen = nla_len(nla);
 	const char *src = nla_data(nla);
 
@@ -385,12 +386,14 @@ size_t nla_strlcpy(char *dst, const struct nlattr *nla, size_t dstsize)
 		srclen--;
 
 	if (dstsize > 0) {
+	    //如果dstsize长度不足源长度，则截断
 		size_t len = (srclen >= dstsize) ? dstsize - 1 : srclen;
 
 		memset(dst, 0, dstsize);
 		memcpy(dst, src, len);
 	}
 
+	/*返回实际源长度*/
 	return srclen;
 }
 

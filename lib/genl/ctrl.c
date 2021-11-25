@@ -428,6 +428,7 @@ struct genl_family *genl_ctrl_search_by_name(struct nl_cache *cache,
  */
 int genl_ctrl_resolve(struct nl_sock *sk, const char *name)
 {
+    /*取给定名称的family id*/
 	struct genl_family *family;
 	int err;
 

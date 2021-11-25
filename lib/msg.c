@@ -443,6 +443,7 @@ int nlmsg_append(struct nl_msg *n, void *data, size_t len, int pad)
 {
 	void *tmp;
 
+	//预留消息buffer，并填充
 	tmp = nlmsg_reserve(n, len, pad);
 	if (tmp == NULL)
 		return -NLE_NOMEM;
@@ -535,6 +536,7 @@ struct nlmsghdr *nlmsg_put(struct nl_msg *n, uint32_t pid, uint32_t seq,
  */
 struct nlmsghdr *nlmsg_hdr(struct nl_msg *n)
 {
+    //取netlink消息头
 	return n->nm_nlh;
 }
 

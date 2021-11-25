@@ -370,7 +370,7 @@ int nl_sendmsg(struct nl_sock *sk, struct nl_msg *msg, struct msghdr *hdr)
  *
  * @lowlevel
  */
-int nl_send_iovec(struct nl_sock *sk, struct nl_msg *msg, struct iovec *iov, unsigned iovlen)
+int nl_send_iovec(struct nl_sock *sk, struct nl_msg *msg, struct iovec *iov, unsigned iovlen/*iov长度*/)
 {
 	struct sockaddr_nl *dst;
 	struct ucred *creds;
@@ -449,6 +449,7 @@ int nl_send(struct nl_sock *sk, struct nl_msg *msg)
 	struct nl_cb *cb = sk->s_cb;
 
 	if (cb->cb_send_ow)
+	    //有send回调，通过此回调完成发送
 		return cb->cb_send_ow(sk, msg);
 	else {
 		struct iovec iov = {
@@ -480,6 +481,7 @@ int nl_send(struct nl_sock *sk, struct nl_msg *msg)
  */
 void nl_complete_msg(struct nl_sock *sk, struct nl_msg *msg)
 {
+    //自动完成netlink 消息头填充
 	struct nlmsghdr *nlh;
 
 	nlh = nlmsg_hdr(msg);
@@ -515,6 +517,7 @@ void nl_complete_msg(struct nl_sock *sk, struct nl_msg *msg)
  */
 int nl_send_auto(struct nl_sock *sk, struct nl_msg *msg)
 {
+    //完成消息头填充，并发送此netlink消息
 	nl_complete_msg(sk, msg);
 
 	return nl_send(sk, msg);
@@ -583,16 +586,19 @@ int nl_send_simple(struct nl_sock *sk, int type, int flags, void *buf,
 	int err;
 	struct nl_msg *msg;
 
+	/*产生netlink消息结构，指定type*/
 	msg = nlmsg_alloc_simple(type, flags);
 	if (!msg)
 		return -NLE_NOMEM;
 
+	//存放l,v完成消息填充
 	if (buf && size) {
 		err = nlmsg_append(msg, buf, size, NLMSG_ALIGNTO);
 		if (err < 0)
 			goto errout;
 	}
 
+	/*触发定义的out回调，并发送消息，*/
 	err = nl_send_auto(sk, msg);
 errout:
 	nlmsg_free(msg);

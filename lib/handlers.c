@@ -306,7 +306,7 @@ int nl_cb_set(struct nl_cb *cb, enum nl_cb_type type, enum nl_cb_kind kind,
 		cb->cb_set[type] = func;
 		cb->cb_args[type] = arg;
 	} else {
-		//如果kind不为custom,则置cb_def
+		//如果kind不为custom,则置此类型默认回调函数cb_def
 		cb->cb_set[type] = cb_def[type][kind];
 		cb->cb_args[type] = arg;
 	}
@@ -350,6 +350,7 @@ int nl_cb_err(struct nl_cb *cb, enum nl_cb_kind kind,
 	if ((unsigned int) kind > NL_CB_KIND_MAX)
 		return -NLE_RANGE;
 
+	//如果错误处理回调是用户自定义的，则设置func,否则使用系统提供的默认错误处理回调
 	if (kind == NL_CB_CUSTOM) {
 		cb->cb_err = func;
 		cb->cb_err_arg = arg;

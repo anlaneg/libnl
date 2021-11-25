@@ -182,6 +182,7 @@ void _nl_socket_used_ports_set(uint32_t *used_ports, uint32_t port)
 
 static struct nl_sock *__alloc_socket(struct nl_cb *cb)
 {
+    /*申请netlink socket*/
 	struct nl_sock *sk;
 
 	sk = calloc(1, sizeof(*sk));
@@ -763,6 +764,7 @@ int nl_socket_modify_cb(struct nl_sock *sk, enum nl_cb_type type,
 			enum nl_cb_kind kind, nl_recvmsg_msg_cb_t func,
 			void *arg)
 {
+    //设置此socket关联的type类型回调
 	return nl_cb_set(sk->s_cb, type, kind, func, arg);
 }
 
@@ -778,6 +780,7 @@ int nl_socket_modify_cb(struct nl_sock *sk, enum nl_cb_type type,
 int nl_socket_modify_err_cb(struct nl_sock *sk, enum nl_cb_kind kind,
 			    nl_recvmsg_err_cb_t func, void *arg)
 {
+    //修改错误处理回调
 	return nl_cb_err(sk->s_cb, kind, func, arg);
 }
 
