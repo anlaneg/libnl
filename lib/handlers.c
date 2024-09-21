@@ -205,6 +205,7 @@ struct nl_cb *nl_cb_alloc(enum nl_cb_kind kind)
 	int i;
 	struct nl_cb *cb;
 
+	/*kind合法检查*/
 	if ((unsigned int) kind > NL_CB_KIND_MAX)
 		return NULL;
 
@@ -215,6 +216,7 @@ struct nl_cb *nl_cb_alloc(enum nl_cb_kind kind)
 	cb->cb_refcnt = 1;
 	cb->cb_active = NL_CB_TYPE_MAX + 1;
 
+	/*cb各类型回调初始化*/
 	for (i = 0; i <= NL_CB_TYPE_MAX; i++)
 		nl_cb_set(cb, i, kind, NULL, NULL);
 

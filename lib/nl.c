@@ -113,7 +113,7 @@ int nl_connect(struct nl_sock *sk, int protocol)
 	if (sk->s_fd != -1)
 		return -NLE_BAD_SOCK;
 
-	//创建对应的netlink socket
+	//按protocol创建对应的netlink socket
 	sk->s_fd = socket(AF_NETLINK, SOCK_RAW | flags, protocol);
 	if (sk->s_fd < 0) {
 		errsv = errno;
@@ -659,8 +659,8 @@ errout:
  * @return Number of bytes read, 0 on EOF, 0 on no data event (non-blocking
  *         mode), or a negative error code.
  */
-int nl_recv(struct nl_sock *sk, struct sockaddr_nl *nla,
-	    unsigned char **buf, struct ucred **creds)
+int nl_recv(struct nl_sock *sk/*要读取的netlink socket*/, struct sockaddr_nl *nla,
+	    unsigned char **buf/*响应内容*/, struct ucred **creds)
 {
 	ssize_t n;
 	int flags = 0;

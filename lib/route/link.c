@@ -1026,6 +1026,7 @@ int rtnl_link_alloc_cache(struct nl_sock *sk, int family, struct nl_cache **resu
 
 	cache->c_iarg1 = family;
 	
+	/*收集所有link信息*/
 	if (sk && (err = nl_cache_refill(sk, cache)) < 0) {
 		nl_cache_free(cache);
 		return err;

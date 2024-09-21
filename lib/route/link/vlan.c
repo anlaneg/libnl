@@ -418,6 +418,7 @@ int rtnl_link_vlan_set_id(struct rtnl_link *link, uint16_t id)
  */
 int rtnl_link_vlan_get_id(struct rtnl_link *link)
 {
+    /*显示link对应的vlan_id*/
 	struct vlan_info *vi = link->l_info;
 
 	IS_VLAN_LINK_ASSERT(link);

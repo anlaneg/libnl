@@ -49,7 +49,7 @@ struct gnet_stats_queue {
 	__u32	qlen;
 	__u32	backlog;
 	__u32	drops;
-	__u32	requeues;
+	__u32	requeues;/*报文出队了，但硬件busy,又入队*/
 	__u32	overlimits;
 };
 

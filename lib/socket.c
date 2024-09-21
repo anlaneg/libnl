@@ -216,7 +216,7 @@ struct nl_sock *nl_socket_alloc(void)
 		return NULL;
 
         /* will increment cb reference count on success */
-	sk = __alloc_socket(cb);
+	sk = __alloc_socket(cb);/*申请sock结构体*/
 
         nl_cb_put(cb);
 
@@ -317,6 +317,7 @@ unsigned int nl_socket_use_seq(struct nl_sock *sk)
  */
 void nl_socket_disable_auto_ack(struct nl_sock *sk)
 {
+	/*禁止auto ack*/
 	sk->s_flags |= NL_NO_AUTO_ACK;
 }
 
@@ -726,6 +727,7 @@ void nl_socket_enable_msg_peek(struct nl_sock *sk)
  */
 void nl_socket_disable_msg_peek(struct nl_sock *sk)
 {
+	/*禁止peek*/
 	sk->s_flags &= ~NL_MSG_PEEK;
 }
 

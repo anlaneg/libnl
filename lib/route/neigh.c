@@ -863,6 +863,7 @@ void rtnl_neigh_set_lladdr(struct rtnl_neigh *neigh, struct nl_addr *addr)
 	__assign_addr(neigh, &neigh->n_lladdr, addr, NEIGH_ATTR_LLADDR, 1);
 }
 
+/*自neigh获取link local地址*/
 struct nl_addr *rtnl_neigh_get_lladdr(struct rtnl_neigh *neigh)
 {
 	if (neigh->ce_mask & NEIGH_ATTR_LLADDR)

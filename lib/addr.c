@@ -223,9 +223,10 @@ struct nl_addr *nl_addr_build(int family, const void *buf, size_t size)
 
 	addr->a_family = family;
 	addr->a_len = size;
-	addr->a_prefixlen = size*8;
+	addr->a_prefixlen = size*8;/*全掩码*/
 
 	if (size)
+	    /*填充地址*/
 		memcpy(addr->a_addr, buf, size);
 
 	return addr;
