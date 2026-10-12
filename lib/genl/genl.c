@@ -44,6 +44,7 @@
  */
 int genl_connect(struct nl_sock *sk)
 {
+	/*指定使用generic协议*/
 	return nl_connect(sk, NETLINK_GENERIC);
 }
 
@@ -346,7 +347,7 @@ int genlmsg_attrlen(const struct genlmsghdr *gnlh, int hdrlen)
  * Returns Pointer to user header or NULL if an error occurred.
  */
 void *genlmsg_put(struct nl_msg *msg, uint32_t port, uint32_t seq, int family,
-		  int hdrlen, int flags, uint8_t cmd, uint8_t version)
+		  int hdrlen, int flags, uint8_t cmd/*netlink命令*/, uint8_t version)
 {
 	struct nlmsghdr *nlh;
 	struct genlmsghdr hdr = {

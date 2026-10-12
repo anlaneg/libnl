@@ -129,6 +129,7 @@ int nl_connect(struct nl_sock *sk, int protocol)
 		goto errout;
 
 	if (_nl_socket_is_local_port_unspecified (sk)) {
+		/*未指定，选择一个port*/
 		uint32_t port;
 		uint32_t used_ports[32] = { 0 };
 
@@ -144,22 +145,23 @@ int nl_connect(struct nl_sock *sk, int protocol)
 			err = bind(sk->s_fd, (struct sockaddr*) &sk->s_local,
 				   sizeof(sk->s_local));
 			if (err == 0)
-				break;
+				break;/*本端绑定此port成功*/
 
 			errsv = errno;
 			if (errsv == EADDRINUSE) {
 				NL_DBG(4, "nl_connect(%p): local port %u already in use. Retry.\n", sk, (unsigned) port);
-				_nl_socket_used_ports_set(used_ports, port);
+				_nl_socket_used_ports_set(used_ports, port);/*端口已被占用，标记出来，重试*/
 			} else {
 				NL_DBG(4, "nl_connect(%p): bind() for port %u failed with %d (%s)\n",
 					sk, (unsigned) port, errsv, strerror_r(errsv, buf, sizeof(buf)));
 				_nl_socket_used_ports_release_all(used_ports);
 				err = -nl_syserr2nlerr(errsv);
-				goto errout;
+				goto errout;/*其它报错，直接响应失败*/
 			}
 		}
 		_nl_socket_used_ports_release_all(used_ports);
 	} else {
+		/*指明了port，按port绑定*/
 		err = bind(sk->s_fd, (struct sockaddr*) &sk->s_local,
 			   sizeof(sk->s_local));
 		if (err != 0) {
@@ -171,6 +173,7 @@ int nl_connect(struct nl_sock *sk, int protocol)
 		}
 	}
 
+	/*取本端地址*/
 	addrlen = sizeof(local);
 	err = getsockname(sk->s_fd, (struct sockaddr *) &local,
 			  &addrlen);
@@ -182,11 +185,13 @@ int nl_connect(struct nl_sock *sk, int protocol)
 	}
 
 	if (addrlen != sizeof(local)) {
+		/*返回的长度有误*/
 		err = -NLE_NOADDR;
 		goto errout;
 	}
 
 	if (local.nl_family != AF_NETLINK) {
+		/*返回的协议有误*/
 		err = -NLE_AF_NOSUPPORT;
 		goto errout;
 	}
@@ -195,8 +200,10 @@ int nl_connect(struct nl_sock *sk, int protocol)
 		/* strange, the port id is not as expected. Set the local
 		 * port id to release a possibly generated port and un-own
 		 * it. */
-		nl_socket_set_local_port (sk, local.nl_pid);
+		nl_socket_set_local_port (sk, local.nl_pid);/*更新本端port*/
 	}
+
+	/*设置本端地址及协议*/
 	sk->s_local = local;
 	sk->s_proto = protocol;
 
@@ -486,18 +493,18 @@ void nl_complete_msg(struct nl_sock *sk, struct nl_msg *msg)
 
 	nlh = nlmsg_hdr(msg);
 	if (nlh->nlmsg_pid == NL_AUTO_PORT)
-		nlh->nlmsg_pid = nl_socket_get_local_port(sk);
+		nlh->nlmsg_pid = nl_socket_get_local_port(sk);/*设置local port*/
 
 	if (nlh->nlmsg_seq == NL_AUTO_SEQ)
-		nlh->nlmsg_seq = sk->s_seq_next++;
+		nlh->nlmsg_seq = sk->s_seq_next++;/*设置seq*/
 
 	if (msg->nm_protocol == -1)
 		msg->nm_protocol = sk->s_proto;
 
-	nlh->nlmsg_flags |= NLM_F_REQUEST;
+	nlh->nlmsg_flags |= NLM_F_REQUEST;/*指明为请求报文*/
 
 	if (!(sk->s_flags & NL_NO_AUTO_ACK))
-		nlh->nlmsg_flags |= NLM_F_ACK;
+		nlh->nlmsg_flags |= NLM_F_ACK;/*指明消息需要应答*/
 }
 
 /**

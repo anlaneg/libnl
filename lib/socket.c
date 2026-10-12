@@ -41,11 +41,13 @@
 
 static int default_cb = NL_CB_DEFAULT;
 
+/*按照环境变量要求初始化default_cb*/
 static void __init init_default_cb(void)
 {
 	char *nlcb;
 
 	if ((nlcb = getenv("NLCB"))) {
+		/*支持在default的基础上提供更多的debug能力*/
 		if (!strcasecmp(nlcb, "default"))
 			default_cb = NL_CB_DEFAULT;
 		else if (!strcasecmp(nlcb, "verbose"))
@@ -62,11 +64,12 @@ static void __init init_default_cb(void)
 static uint32_t used_ports_map[32];
 static NL_RW_LOCK(port_map_lock);
 
+/*生成本端local port*/
 static uint32_t generate_local_port(void)
 {
 	int i, j, n, m;
 	static uint16_t idx_state = 0;
-	uint32_t pid = getpid() & 0x3FFFFF;
+	uint32_t pid = getpid() & 0x3FFFFF;/*取进程pid*/
 
 	nl_write_lock(&port_map_lock);
 
@@ -179,7 +182,7 @@ void _nl_socket_used_ports_set(uint32_t *used_ports, uint32_t port)
  * @name Allocation
  * @{
  */
-
+/*使用此cb进行netlink socket申请并初始化*/
 static struct nl_sock *__alloc_socket(struct nl_cb *cb)
 {
     /*申请netlink socket*/
@@ -190,7 +193,7 @@ static struct nl_sock *__alloc_socket(struct nl_cb *cb)
 		return NULL;
 
 	sk->s_fd = -1;
-	sk->s_cb = nl_cb_get(cb);
+	sk->s_cb = nl_cb_get(cb);/*先指明cb*/
 	sk->s_local.nl_family = AF_NETLINK;
 	sk->s_peer.nl_family = AF_NETLINK;
 	sk->s_seq_expect = sk->s_seq_next = time(NULL);
@@ -209,7 +212,7 @@ static struct nl_sock *__alloc_socket(struct nl_cb *cb)
 struct nl_sock *nl_socket_alloc(void)
 {
 	struct nl_cb *cb;
-        struct nl_sock *sk;
+    struct nl_sock *sk;
 
 	cb = nl_cb_alloc(default_cb);
 	if (!cb)
@@ -218,9 +221,10 @@ struct nl_sock *nl_socket_alloc(void)
         /* will increment cb reference count on success */
 	sk = __alloc_socket(cb);/*申请sock结构体*/
 
-        nl_cb_put(cb);
+	/*申请时又get了一次，这里put掉，使cb计数于此处保持在1*/
+    nl_cb_put(cb);
 
-        return sk;
+    return sk;
 }
 
 /**
@@ -346,9 +350,9 @@ uint32_t _nl_socket_generate_local_port_no_release(struct nl_sock *sk)
 	/* reset the port to generate_local_port(), but do not release
 	 * the previously generated port. */
 
-	port = generate_local_port();
+	port = generate_local_port();/*生成local port*/
 	sk->s_flags &= ~NL_OWN_PORT;
-	sk->s_local.nl_pid = port;
+	sk->s_local.nl_pid = port;/*设置本端port*/
 	return port;
 }
 /** \endcond */
@@ -357,7 +361,7 @@ uint32_t _nl_socket_generate_local_port_no_release(struct nl_sock *sk)
  * @name Source Idenficiation
  * @{
  */
-
+/*获取local port*/
 uint32_t nl_socket_get_local_port(const struct nl_sock *sk)
 {
 	if (sk->s_local.nl_pid == 0) {
@@ -434,6 +438,7 @@ int nl_socket_add_memberships(struct nl_sock *sk, int group, ...)
 			return -NLE_INVAL;
 		}
 
+		/*设置增加组播关系*/
 		err = setsockopt(sk->s_fd, SOL_NETLINK, NETLINK_ADD_MEMBERSHIP,
 						 &group, sizeof(group));
 		if (err < 0) {
@@ -453,6 +458,7 @@ int nl_socket_add_memberships(struct nl_sock *sk, int group, ...)
 	return 0;
 }
 
+/*指明此socket关注组播组*/
 int nl_socket_add_membership(struct nl_sock *sk, int group)
 {
 	return nl_socket_add_memberships(sk, group, 0);

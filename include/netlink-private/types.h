@@ -27,6 +27,7 @@
 #define NL_SOCK_PASSCRED	(1<<1)
 #define NL_OWN_PORT		(1<<2)
 #define NL_MSG_PEEK		(1<<3)
+/*如无此标记，则消息需要应答*/
 #define NL_NO_AUTO_ACK		(1<<4)
 
 #define NL_MSG_CRED_PRESENT 1
@@ -38,13 +39,13 @@ struct nl_hash_table;
 
 struct nl_cb
 {
-	//各type回调函数
+	//各type回调函数（如果未使用custom,则默认采用cb_def[type][kind]填充）
 	nl_recvmsg_msg_cb_t	cb_set[NL_CB_TYPE_MAX+1];
 	//各type回调函数参数
 	void *			cb_args[NL_CB_TYPE_MAX+1];
 
-	nl_recvmsg_err_cb_t	cb_err;
-	void *			cb_err_arg;
+	nl_recvmsg_err_cb_t	cb_err;/*错误回调（如果未使用custom,则默认采用cb_err_def填充）*/
+	void *			cb_err_arg;/*错误回调参数*/
 
 	/** May be used to replace nl_recvmsgs with your own implementation
 	 * in all internal calls to nl_recvmsgs. */
@@ -65,19 +66,19 @@ struct nl_cb
 
 	int			cb_refcnt;//引用计数
 	/** indicates the callback that is currently active */
-	enum nl_cb_type		cb_active;
+	enum nl_cb_type		cb_active;/*用于指明当前哪个cb是有效的*/
 };
 
 struct nl_sock
 {
-	struct sockaddr_nl	s_local;
-	struct sockaddr_nl	s_peer;
+	struct sockaddr_nl	s_local;/*本端地址*/
+	struct sockaddr_nl	s_peer;/*对端地址*/
 	int			s_fd;//操作用的fd
 	int			s_proto;
 	unsigned int		s_seq_next;
 	unsigned int		s_seq_expect;
 	int			s_flags;
-	struct nl_cb *		s_cb;/*消息发送处理相关回调结构*/
+	struct nl_cb *		s_cb;/*socket关联的控制块，用于消息发送/处理等相关回调的指明*/
 	size_t			s_bufsize;
 };
 
@@ -140,7 +141,7 @@ struct nl_msg
 	struct sockaddr_nl	nm_dst;
 	struct ucred		nm_creds;
 	struct nlmsghdr *	nm_nlh;/*netlink消息头*/
-	size_t			nm_size;
+	size_t			nm_size;/*消息buffer长度*/
 	int			nm_refcnt;
 };
 
@@ -796,7 +797,7 @@ struct genl_family
 	NLHDR_COMMON
 
 	uint16_t		gf_id;
-	char 			gf_name[GENL_NAMSIZ];
+	char 			gf_name[GENL_NAMSIZ];/*family名称*/
 	uint32_t		gf_version;
 	uint32_t		gf_hdrsize;
 	uint32_t		gf_maxattr;

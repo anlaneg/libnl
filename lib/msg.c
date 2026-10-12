@@ -37,6 +37,7 @@ static size_t default_msg_size;
 
 static void __init init_msg_size(void)
 {
+	/*初始化默认大小为1页*/
 	default_msg_size = getpagesize();
 }
 
@@ -271,13 +272,13 @@ static struct nl_msg *__nlmsg_alloc(size_t len)
 
 	nm->nm_refcnt = 1;
 
-	nm->nm_nlh = calloc(1, len);
+	nm->nm_nlh = calloc(1, len);/*申请消息buffer，并指向*/
 	if (!nm->nm_nlh)
 		goto errout;
 
 	nm->nm_protocol = -1;
 	nm->nm_size = len;
-	nm->nm_nlh->nlmsg_len = nlmsg_total_size(0);
+	nm->nm_nlh->nlmsg_len = nlmsg_total_size(0);/*消息长度指为零*/
 
 	NL_DBG(2, "msg %p: Allocated new message, maxlen=%zu\n", nm, len);
 

@@ -83,6 +83,7 @@
  */
 int nfnl_connect(struct nl_sock *sk)
 {
+	/*指定使用netfilter协议*/
 	return nl_connect(sk, NETLINK_NETFILTER);
 }
 

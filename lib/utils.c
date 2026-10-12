@@ -887,6 +887,7 @@ static void dump_one(struct nl_dump_params *parms, const char *fmt,
 		     va_list args)
 {
 	if (parms->dp_fd)
+		/*输出到fd*/
 		vfprintf(parms->dp_fd, fmt, args);
 	else if (parms->dp_buf || parms->dp_cb) {
 		char *buf = NULL;
@@ -894,6 +895,7 @@ static void dump_one(struct nl_dump_params *parms, const char *fmt,
 			if (parms->dp_cb)
 				parms->dp_cb(parms, buf);
 			else
+				/*输出到buffer中*/
 				strncat(parms->dp_buf, buf,
 					parms->dp_buflen -
 					strlen(parms->dp_buf) - 1);
@@ -917,6 +919,7 @@ void nl_dump(struct nl_dump_params *params, const char *fmt, ...)
 	va_list args;
 
 	va_start(args, fmt);
+	/*dump输出*/
 	dump_one(params, fmt, args);
 	va_end(args);
 }

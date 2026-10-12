@@ -246,8 +246,10 @@ static struct genl_family *genl_ctrl_probe_by_name(struct nl_sock *sk,
 	if (!ret)
 		goto out;
 
+	/*设置名称*/
 	genl_family_set_name(ret, name);
 
+	/*申请消息*/
 	msg = nlmsg_alloc();
 	if (!msg)
 		goto out_fam_free;
@@ -255,17 +257,20 @@ static struct genl_family *genl_ctrl_probe_by_name(struct nl_sock *sk,
 	if (!(orig = nl_socket_get_cb(sk)))
 		goto out_msg_free;
 
+	/*复制cb*/
 	cb = nl_cb_clone(orig);
 	nl_cb_put(orig);
 	if (!cb)
 		goto out_msg_free;
 
-	if (!genlmsg_put(msg, NL_AUTO_PORT, NL_AUTO_SEQ, GENL_ID_CTRL,
+	/*通过内置的GENL_ID_CTRL family发送GETFAMILY命令，获取family id(这里构造消息头)*/
+	if (!genlmsg_put(msg, NL_AUTO_PORT, NL_AUTO_SEQ, GENL_ID_CTRL/*设置的family id*/,
 			0, 0, CTRL_CMD_GETFAMILY, 1)) {
 		BUG();
 		goto out_cb_free;
 	}
 
+	/*设置family name*/
 	if (nla_put_string(msg, CTRL_ATTR_FAMILY_NAME, name) < 0)
 		goto out_cb_free;
 
@@ -444,6 +449,7 @@ errout:
 	return err;
 }
 
+/*通过名称查询组播组id*/
 static int genl_ctrl_grp_by_name(const struct genl_family *family,
 				 const char *grp_name)
 {
@@ -470,18 +476,20 @@ static int genl_ctrl_grp_by_name(const struct genl_family *family,
  * @return Numeric group identifier or a negative error code.
  */
 int genl_ctrl_resolve_grp(struct nl_sock *sk, const char *family_name,
-			  const char *grp_name)
+			  const char *grp_name/*组播组名称*/)
 {
 
 	struct genl_family *family;
 	int err;
 
+	/*通过family_name查kernel,构造genl_family结构体*/
 	family = genl_ctrl_probe_by_name(sk, family_name);
 	if (family == NULL) {
 		err = -NLE_OBJ_NOTFOUND;
 		goto errout;
 	}
 
+	/*取组播组id*/
 	err = genl_ctrl_grp_by_name(family, grp_name);
 	genl_family_put(family);
 errout:

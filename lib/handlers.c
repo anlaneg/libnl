@@ -199,7 +199,7 @@ static nl_recvmsg_err_cb_t cb_err_def[NL_CB_KIND_MAX+1] = {
  * @arg kind		callback kind to be used for initialization
  * @return Newly allocated callback handle or NULL
  */
-//申请空的callback控制块
+//申请netlink callback控制块，并执行初始化
 struct nl_cb *nl_cb_alloc(enum nl_cb_kind kind)
 {
 	int i;
@@ -209,14 +209,15 @@ struct nl_cb *nl_cb_alloc(enum nl_cb_kind kind)
 	if ((unsigned int) kind > NL_CB_KIND_MAX)
 		return NULL;
 
+	/*申请nl_cb*/
 	cb = calloc(1, sizeof(*cb));
 	if (!cb)
 		return NULL;
 
 	cb->cb_refcnt = 1;
-	cb->cb_active = NL_CB_TYPE_MAX + 1;
+	cb->cb_active = NL_CB_TYPE_MAX + 1;/*指明当前active cb为无效*/
 
-	/*cb各类型回调初始化*/
+	/*cb各类型回调初始化，参数及回调均为NULL*/
 	for (i = 0; i <= NL_CB_TYPE_MAX; i++)
 		nl_cb_set(cb, i, kind, NULL, NULL);
 
@@ -233,6 +234,7 @@ struct nl_cb *nl_cb_alloc(enum nl_cb_kind kind)
  */
 struct nl_cb *nl_cb_clone(struct nl_cb *orig)
 {
+	/*复制nl_cb*/
 	struct nl_cb *cb;
 
 	cb = nl_cb_alloc(NL_CB_DEFAULT);
@@ -245,6 +247,7 @@ struct nl_cb *nl_cb_clone(struct nl_cb *orig)
 	return cb;
 }
 
+/*增加cb引用计数*/
 struct nl_cb *nl_cb_get(struct nl_cb *cb)
 {
 	cb->cb_refcnt++;
@@ -298,10 +301,10 @@ int nl_cb_set(struct nl_cb *cb, enum nl_cb_type type, enum nl_cb_kind kind,
 	      nl_recvmsg_msg_cb_t func, void *arg)
 {
 	if ((unsigned int) type > NL_CB_TYPE_MAX)
-		return -NLE_RANGE;
+		return -NLE_RANGE;/*指定的type无效*/
 
 	if ((unsigned int) kind > NL_CB_KIND_MAX)
-		return -NLE_RANGE;
+		return -NLE_RANGE;/*指定的回调类型无效*/
 
 	if (kind == NL_CB_CUSTOM) {
 		//如果kind为custom,则置func

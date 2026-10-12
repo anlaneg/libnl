@@ -56,8 +56,9 @@ struct nl_object *nl_object_alloc(struct nl_object_ops *ops)
 	struct nl_object *new;
 
 	if (ops->oo_size < sizeof(*new))
-		BUG();
+		BUG();/*结构体过小*/
 
+	/*申请nl_object*/
 	new = calloc(1, ops->oo_size);
 	if (!new)
 		return NULL;
@@ -66,6 +67,7 @@ struct nl_object *nl_object_alloc(struct nl_object_ops *ops)
 	nl_init_list_head(&new->ce_list);
 
 	new->ce_ops = ops;
+	/*调用初始化*/
 	if (ops->oo_constructor)
 		ops->oo_constructor(new);
 

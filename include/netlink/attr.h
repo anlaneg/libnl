@@ -59,13 +59,13 @@ enum {
  */
 struct nla_policy {
 	/** Type of attribute or NLA_UNSPEC */
-	uint16_t	type;
+	uint16_t	type;/*指明此属性数据类型*/
 
 	/** Minimal length of payload required */
-	uint16_t	minlen;
+	uint16_t	minlen;/*指明此属性数据最小长度*/
 
 	/** Maximal length of payload allowed */
-	uint16_t	maxlen;
+	uint16_t	maxlen;/*指明此属性数据最大长度*/
 };
 
 /* Size calculations */

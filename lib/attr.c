@@ -108,6 +108,7 @@ int nla_padlen(int payload)
  */
 int nla_type(const struct nlattr *nla)
 {
+	/*取netlink attribute type*/
 	return nla->nla_type & NLA_TYPE_MASK;
 }
 
@@ -130,6 +131,7 @@ void *nla_data(const struct nlattr *nla)
  */
 int nla_len(const struct nlattr *nla)
 {
+	/*取payload长度（移除了header length)*/
 	return nla->nla_len - NLA_HDRLEN;
 }
 
@@ -170,12 +172,13 @@ int nla_ok(const struct nlattr *nla, int remaining)
  */
 struct nlattr *nla_next(const struct nlattr *nla, int *remaining)
 {
-	int totlen = NLA_ALIGN(nla->nla_len);
+	int totlen = NLA_ALIGN(nla->nla_len);/*当前nla总长度（含padding)*/
 
-	*remaining -= totlen;
-	return (struct nlattr *) ((char *) nla + totlen);
+	*remaining -= totlen;/*剩余长度*/
+	return (struct nlattr *) ((char *) nla + totlen);/*返回下一个nlattr*/
 }
 
+/*各类型默认的minlen*/
 static uint16_t nla_attr_minlen[NLA_TYPE_MAX+1] = {
 	[NLA_U8]	= sizeof(uint8_t),
 	[NLA_U16]	= sizeof(uint16_t),
@@ -185,6 +188,7 @@ static uint16_t nla_attr_minlen[NLA_TYPE_MAX+1] = {
 	[NLA_FLAG]	= 0,
 };
 
+/*校验nla*/
 static int validate_nla(const struct nlattr *nla, int maxtype,
 			const struct nla_policy *policy)
 {
@@ -193,25 +197,26 @@ static int validate_nla(const struct nlattr *nla, int maxtype,
 	int type = nla_type(nla);
 
 	if (type < 0 || type > maxtype)
-		return 0;
+		return 0;/*type不合法*/
 
-	pt = &policy[type];
+	pt = &policy[type];/*取此type对应的policy*/
 
 	if (pt->type > NLA_TYPE_MAX)
-		BUG();
+		BUG();/*填写的数据类型有误*/
 
 	if (pt->minlen)
-		minlen = pt->minlen;
+		minlen = pt->minlen;/*有minlen的以minlen为准*/
 	else if (pt->type != NLA_UNSPEC)
-		minlen = nla_attr_minlen[pt->type];
+		minlen = nla_attr_minlen[pt->type];/*取默认各类型对应的minlen*/
 
 	if (nla_len(nla) < minlen)
-		return -NLE_RANGE;
+		return -NLE_RANGE;/*实际内容长度小于minlen限制*/
 
 	if (pt->maxlen && nla_len(nla) > pt->maxlen)
-		return -NLE_RANGE;
+		return -NLE_RANGE;/*实际内容长度超过了maxlen限制*/
 
 	if (pt->type == NLA_STRING) {
+		/*字符串类型，其末尾需要为'\0'*/
 		const char *data = nla_data(nla);
 		if (data[nla_len(nla) - 1] != '\0')
 			return -NLE_INVAL;
@@ -239,12 +244,13 @@ static int validate_nla(const struct nlattr *nla, int maxtype,
  * @see nla_validate
  * @return 0 on success or a negative error code.
  */
-int nla_parse(struct nlattr *tb[], int maxtype, struct nlattr *head, int len,
-	      struct nla_policy *policy)
+int nla_parse(struct nlattr *tb[]/*出参，解析得到的各属性类型值*/, int maxtype/*最大属性类型*/, struct nlattr *head/*属性起始位置*/, int len/*总长度*/,
+	      struct nla_policy *policy/*此消息校验策略*/)
 {
 	struct nlattr *nla;
 	int rem, err;
 
+	/*先将解析结果清零*/
 	memset(tb, 0, sizeof(struct nlattr *) * (maxtype + 1));
 
 	//解析消息并填充至tb中
@@ -257,14 +263,15 @@ int nla_parse(struct nlattr *tb[], int maxtype, struct nlattr *head, int len,
 		if (policy) {
 			err = validate_nla(nla, maxtype, policy);
 			if (err < 0)
-				goto errout;
+				goto errout;/*校验失败*/
 		}
 
 		if (tb[type])
+			/*此属性在结构体中存在多次*/
 			NL_DBG(1, "Attribute of type %#x found multiple times in message, "
 				  "previous attribute is being ignored.\n", type);
 
-		tb[type] = nla;
+		tb[type] = nla;/*记录此属性对应的nla*/
 	}
 
 	if (rem > 0)
@@ -602,6 +609,7 @@ int nla_put_u16(struct nl_msg *msg, int attrtype, uint16_t value)
  */
 uint16_t nla_get_u16(const struct nlattr *nla)
 {
+	/*取属性值（属性类型为u16)*/
 	return *(const uint16_t *) nla_data(nla);
 }
 

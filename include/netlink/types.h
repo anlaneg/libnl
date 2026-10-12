@@ -60,7 +60,7 @@ struct nl_dump_params
 	 *  - dumping parameters
 	 *  - string to append to the output
 	 */
-	void			(*dp_cb)(struct nl_dump_params *, char *);
+	void			(*dp_cb)(struct nl_dump_params *, char *);/*使用回调dump,参数2为dump后的内容*/
 
 	/**
 	 * A callback invoked for every new line, can be used to
@@ -80,12 +80,12 @@ struct nl_dump_params
 	/**
 	 * File descriptor the dumping output should go to
 	 */
-	FILE *			dp_fd;
+	FILE *			dp_fd;/*dump输出fd*/
 
 	/**
 	 * Alternatively the output may be redirected into a buffer
 	 */
-	char *			dp_buf;
+	char *			dp_buf;/*dump输出到buffer*/
 
 	/**
 	 * Length of the buffer dp_buf

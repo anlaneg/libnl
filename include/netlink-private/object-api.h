@@ -257,9 +257,9 @@ struct nl_object
  * diff |= ATTR_DIFF(attrs, MY_ATTR_FOO, a, b, a->foo != b->foo);
  * @endcode
  */
-#define ATTR_DIFF(LIST, ATTR, A, B, EXPR) \
+#define ATTR_DIFF(LIST/*掩码形式的一组ATTR*/, ATTR/*属性ID*/, A/*变量A*/, B/*变量B*/, EXPR/*表达式*/) \
 ({	int diff = 0; \
-	if (((LIST) & (ATTR)) && ATTR_MISMATCH(A, B, ATTR, EXPR)) \
+	if (((LIST) & (ATTR))/*需要比对此属性*/ && ATTR_MISMATCH(A, B, ATTR, EXPR)) \
 		diff = ATTR; \
 	diff; })
 
@@ -273,10 +273,10 @@ struct nl_object_ops
 	 *
 	 * Must be in the form family/name, e.g. "route/addr"
 	 */
-	char *		oo_name;
+	char *		oo_name;/*名称*/
 
 	/** Size of object including its header */
-	size_t		oo_size;
+	size_t		oo_size;/*obj大小*/
 
 	/* List of attributes needed to uniquely identify the object */
 	uint32_t	oo_id_attrs;
@@ -287,7 +287,7 @@ struct nl_object_ops
 	 * Will be called when a new object of this type is allocated.
 	 * Can be used to initialize members such as lists etc.
 	 */
-	void  (*oo_constructor)(struct nl_object *);
+	void  (*oo_constructor)(struct nl_object *);/*结构体构造函数*/
 
 	/**
 	 * Destructor function
@@ -296,7 +296,7 @@ struct nl_object_ops
 	 * resources which may have been allocated as part of this
 	 * object.
 	 */
-	void  (*oo_free_data)(struct nl_object *);
+	void  (*oo_free_data)(struct nl_object *);/*用于释放*/
 
 	/**
 	 * Cloning function
@@ -308,7 +308,7 @@ struct nl_object_ops
 	 *
 	 * May return a negative error code to abort cloning.
 	 */
-	int  (*oo_clone)(struct nl_object *, struct nl_object *);
+	int  (*oo_clone)(struct nl_object *, struct nl_object *);/*用于复制*/
 
 	/**
 	 * Dumping functions
@@ -320,7 +320,7 @@ struct nl_object_ops
 	 * The functions must return the number of lines printed.
 	 */
 	void (*oo_dump[NL_DUMP_MAX+1])(struct nl_object *,
-				       struct nl_dump_params *);
+				       struct nl_dump_params *);/*一组dump回调函数，例如dump到一行等*/
 
 	/**
 	 * Comparison function
@@ -334,7 +334,7 @@ struct nl_object_ops
 	 * set for each attribute that mismatches.
 	 */
 	int   (*oo_compare)(struct nl_object *, struct nl_object *,
-			    uint32_t, int);
+			    uint32_t, int);/*按照bitmask比对两个obj*/
 
 
 	/**

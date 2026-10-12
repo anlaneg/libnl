@@ -154,7 +154,7 @@ static int family_compare(struct nl_object *_a, struct nl_object *_b,
 	struct genl_family *b = (struct genl_family *) _b;
 	int diff = 0;
 
-#define FAM_DIFF(ATTR, EXPR) ATTR_DIFF(attrs, FAMILY_ATTR_##ATTR, a, b, EXPR)
+#define FAM_DIFF(ATTR, EXPR) ATTR_DIFF(attrs, FAMILY_ATTR_##ATTR, a/*变量a*/, b, EXPR)
 
 	diff |= FAM_DIFF(ID,		a->gf_id != b->gf_id);
 	diff |= FAM_DIFF(VERSION,	a->gf_version != b->gf_version);
@@ -180,6 +180,7 @@ static int family_compare(struct nl_object *_a, struct nl_object *_b,
  */
 struct genl_family *genl_family_alloc(void)
 {
+	/*各类型对应了一个family_ops*/
 	return (struct genl_family *) nl_object_alloc(&genl_family_ops);
 }
 
